@@ -20,6 +20,10 @@ def send_telegram_message(message):
     response = requests.post(url, json=payload)
     return response.status_code == 200
 
+@app.route('/')
+def serve_index():
+    return send_from_directory('.', 'index.html')
+
 @app.route("/report", methods=["GET"])
 def report_emergency():  
     try:
