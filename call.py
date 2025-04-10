@@ -16,9 +16,9 @@ TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 
 
 CONTACTS = {
-    "Theft": "+919149083577",
-    "Accident": "+919149083577",
-    "Fire": "+919149083577",
+    "Theft": "+918115067311",
+    "Accident": "+918115067311",
+    "Fire": "+918115067311",
 }
 
 def generate_message(prompt):
