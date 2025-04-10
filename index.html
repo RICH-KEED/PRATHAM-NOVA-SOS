@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Alert System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Three.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #e63946;
+            --secondary-color: #1d3557;
+            --accent-color: #457b9d;
+            --background-color: #f1faee;
+            --success-color: #2a9d8f;
+            --warning-color: #e9c46a;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-light: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: rgba(29, 53, 87, 0.9);
+            backdrop-filter: blur(5px);
+            color: var(--text-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .settings-icon {
+            background-color: transparent;
+            color: var(--text-light);
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .settings-icon:hover {
+            transform: rotate(30deg);
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .form-title {
+            margin-bottom: 25px;
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .input-container {
+            display: flex;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-container .icon {
+            padding: 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            min-width: 50px;
+            text-align: center;
+            border-top-left-radius: var(--border-radius);
+            border-bottom-left-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            outline: none;
+            border: 1px solid #ddd;
+            border-top-right-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+            border-left: none;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(29, 53, 87, 0.2);
+        }
+
+        select.input-field {
+            cursor: pointer;
+            background-color: white;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        .location-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: rgba(29, 53, 87, 0.05);
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+
+        .location-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .location-value {
+            font-weight: bold;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            width: 100%;
+            box-shadow: 0 0 15px rgba(230, 57, 70, 0.5);
+        }
+
+        .btn:hover {
+            background-color: #c1121f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-dark);
+            background: none;
+            border: none;
+        }
+
+        .close-modal:hover {
+            color: var(--primary-color);
+        }
+
+        .modal-title {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .status-message {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: var(--border-radius);
+            display: none;
+            font-weight: bold;
+        }
+
+        .success {
+            background-color: rgba(42, 157, 143, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .error {
+            background-color: rgba(230, 57, 70, 0.2);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .loading {
+            background-color: rgba(233, 196, 106, 0.2);
+            color: #975a16;
+            border: 1px solid var(--warning-color);
+        }
+
+        .incident-type-container {
+            margin-bottom: 25px;
+        }
+
+        .incident-option {
+            background-color: var(--card-bg);
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .incident-option:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .incident-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(230, 57, 70, 0.05);
+            box-shadow: 0 0 15px rgba(230, 57, 70, 0.5);
+        }
+
+        .incident-icon {
+            background-color: var(--secondary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .incident-details {
+            flex: 1;
+        }
+
+        .incident-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var (--secondary-color);
+        }
+
+        .incident-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px;
+            }
+
+            .header h1 {
+                margin-bottom: 10px;
+                font-size: 1.5rem;
+            }
+
+            .form-title {
+                font-size: 1.3rem;
+            }
+
+            .input-container .icon, .input-field {
+                padding: 12px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Three.js Canvas Styling */
+        #threeJsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Three.js Canvas -->
+    <canvas id="threeJsCanvas"></canvas>
+    
+    <div class="container">
+        <header class="header">
+            <h1>Emergency Alert System</h1>
+            <button class="settings-icon" id="settingsBtn">
+                <i class="fas fa-cog"></i>
+            </button>
+        </header>
+
+        <div class="card">
+            <h2 class="form-title">Report an Emergency</h2>
+            <form id="emergencyForm">
+                <div class="input-container">
+                    <div class="icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="text" class="input-field" id="reporterName" placeholder="Your Name" required>
+                </div>
+
+                <h3 class="form-title">Select Incident Type</h3>
+                <div class="incident-type-container">
+                    <div class="incident-option" data-value="Theft">
+                        <div class="incident-icon">
+                            <i class="fas fa-mask"></i>
+                        </div>
+                        <div class="incident-details">
+                            <div class="incident-title">Theft</div>
+                            <div class="incident-description">Report stolen items or ongoing theft situations</div>
+                        </div>
+                    </div>
+                    
+                    <div class="incident-option" data-value="Accident">
+                        <div class="incident-icon">
+                            <i class="fas fa-car-crash"></i>
+                        </div>
+                        <div class="incident-details">
+                            <div class="incident-title">Accident</div>
+                            <div class="incident-description">Report vehicle collisions or personal injury incidents</div>
+                        </div>
+                    </div>
+                    
+                    <div class="incident-option" data-value="Fire">
+                        <div class="incident-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="incident-details">
+                            <div class="incident-title">Fire</div>
+                            <div class="incident-description">Report active fires or fire hazards requiring immediate attention</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="incidentType" required>
+
+                <div class="location-info">
+                    <p>Latitude: <span id="latitude" class="location-value">Detecting...</span></p>
+                    <p>Longitude: <span id="longitude" class="location-value">Detecting...</span></p>
+                </div>
+
+                <div class="input-container">
+                    <div class="icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <textarea class="input-field" id="description" placeholder="Describe the emergency" rows="4" required></textarea>
+                </div>
+
+                <button type="submit" class="btn" id="reportBtn">
+                    <i class="fas fa-exclamation-triangle"></i> Report Emergency
+                </button>
+            </form>
+            
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <h3 class="modal-title">Settings</h3>
+            <div class="input-container">
+                <div class="icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <input type="url" class="input-field" id="apiUrl" placeholder="API URL">
+            </div>
+            <button class="btn" id="saveSettingsBtn">Save Settings</button>
+        </div>
+    </div>
+
+    <script>
+        // Three.js Implementation
+        let scene, camera, renderer;
+        let particles, geometry, materials = [];
+        let particleSystem;
+        let mouseX = 0, mouseY = 0;
+        const particleCount = 1000;
+        
+        function initThreeJs() {
+            // Initialize scene
+            scene = new THREE.Scene();
+            
+            // Initialize camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 20;
+            
+            // Initialize renderer
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('threeJsCanvas'),
+                alpha: true,
+                antialias: true 
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // Create particle geometry
+            geometry = new THREE.BufferGeometry();
+            const vertices = [];
+            
+            // Emergency colors
+            const colors = [
+                new THREE.Color(0xe63946), // Primary red
+                new THREE.Color(0xf1faee), // Light background
+                new THREE.Color(0x1d3557)  // Dark blue
+            ];
+            
+            // Create particles with random positions
+            for (let i = 0; i < particleCount; i++) {
+                const x = Math.random() * 40 - 20;
+                const y = Math.random() * 40 - 20;
+                const z = Math.random() * 40 - 20;
+                vertices.push(x, y, z);
+            }
+            
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            
+            // Create emergency-themed particle materials
+            for (let color of colors) {
+                materials.push(
+                    new THREE.PointsMaterial({
+                        size: 0.5,
+                        color: color,
+                        transparent: true,
+                        opacity: 0.8,
+                        blending: THREE.AdditiveBlending
+                    })
+                );
+            }
+            
+            // Create particle systems for each material
+            for (let i = 0; i < materials.length; i++) {
+                const particles = new THREE.Points(geometry, materials[i]);
+                particles.rotation.x = Math.random() * 6;
+                particles.rotation.y = Math.random() * 6;
+                particles.rotation.z = Math.random() * 6;
+                scene.add(particles);
+            }
+            
+            // Create pulsing alert light
+            const light = new THREE.PointLight(0xe63946, 1, 100);
+            light.position.set(0, 0, 10);
+            scene.add(light);
+            
+            // Add event listener for mouse movement
+            document.addEventListener('mousemove', onMouseMove);
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start animation
+            animate();
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate and animate particles
+            scene.children.forEach((child, index) => {
+                if (child instanceof THREE.Points) {
+                    child.rotation.y += 0.001 + index * 0.0003;
+                    child.rotation.x += 0.002 + index * 0.0001;
+                    
+                    // Pulsing effect
+                    const time = Date.now() * 0.0005;
+                    child.material.size = Math.sin(time + index) * 0.5 + 0.5;
+                }
+                
+                if (child instanceof THREE.PointLight) {
+                    // Make light pulse like an emergency light
+                    const time = Date.now() * 0.003;
+                    child.intensity = Math.sin(time) * 0.5 + 0.5;
+                }
+            });
+            
+            // Move based on mouse position
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            
+            renderer.render(scene, camera);
+        }
+        
+        function onMouseMove(event) {
+            mouseX = (event.clientX - window.innerWidth / 2) / 100;
+            mouseY = (event.clientY - window.innerHeight / 2) / 100;
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Initialize the app after the window loads
+        window.addEventListener('load', () => {
+            initApp();
+            initThreeJs();
+        });
+        
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const closeModal = document.getElementById('closeModal');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const apiUrlInput = document.getElementById('apiUrl');
+        const emergencyForm = document.getElementById('emergencyForm');
+        const latitudeElement = document.getElementById('latitude');
+        const longitudeElement = document.getElementById('longitude');
+        const statusMessage = document.getElementById('statusMessage');
+        const incidentOptions = document.querySelectorAll('.incident-option');
+        const incidentTypeInput = document.getElementById('incidentType');
+    
+        const DEFAULT_API_URL = 'http://localhost:5000/report';
+        
+        let currentLocation = {
+            lat: null,
+            lng: null
+        };
+
+        function initApp() {
+            const savedApiUrl = localStorage.getItem('emergencyApiUrl') || DEFAULT_API_URL;
+            apiUrlInput.value = savedApiUrl;
+            
+            getLocation();
+            
+            setupIncidentSelection();
+        }
+    
+        function setupIncidentSelection() {
+            incidentOptions.forEach(option => {
+                option.addEventListener('click', () => {
+
+                    incidentOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+
+                    option.classList.add('selected');
+                    
+
+                    incidentTypeInput.value = option.dataset.value;
+                });
+            });
+        }
+    
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        currentLocation.lat = position.coords.latitude;
+                        currentLocation.lng = position.coords.longitude;
+                        
+                        latitudeElement.textContent = currentLocation.lat.toFixed(6);
+                        longitudeElement.textContent = currentLocation.lng.toFixed(6);
+                    },
+                    (error) => {
+                        console.error("Error getting location:", error);
+                        latitudeElement.textContent = "Not available";
+                        longitudeElement.textContent = "Not available";
+                        showStatus("Location services are disabled. Please enable them for accurate reporting.", "error");
+                    }
+                );
+            } else {
+                latitudeElement.textContent = "Not supported";
+                longitudeElement.textContent = "Not supported";
+                showStatus("Your browser doesn't support geolocation.", "error");
+            }
+        }
+    
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = "status-message";
+            statusMessage.classList.add(type);
+            statusMessage.style.display = "block";
+            
+            if (type === "success") {
+                setTimeout(() => {
+                    statusMessage.style.display = "none";
+                }, 5000);
+            }
+        }
+    
+        async function submitReport(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('reporterName').value;
+            const subject = incidentTypeInput.value;
+            const description = document.getElementById('description').value || "";
+            
+            if (!name) {
+                showStatus("Please enter your name.", "error");
+                return;
+            }
+            
+            if (!subject) {
+                showStatus("Please select an incident type.", "error");
+                return;
+            }
+            
+            if (!currentLocation.lat || !currentLocation.lng) {
+                showStatus("Location data is not available. Please try again or enter location manually.", "error");
+                return;
+            }
+            
+            const apiUrl = localStorage.getItem('emergencyApiUrl') || DEFAULT_API_URL;
+            
+            showStatus("Sending emergency report...", "loading");
+            
+            try {
+
+                const url = new URL(apiUrl);
+                url.searchParams.append('name', name);
+                url.searchParams.append('subject', subject);
+                url.searchParams.append('description', description);
+                url.searchParams.append('lat', currentLocation.lat.toFixed(6));
+                url.searchParams.append('lng', currentLocation.lng.toFixed(6));
+                
+                const response = await fetch(url.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    showStatus(`Emergency reported successfully. Help is on the way! An alert has been sent to the ${subject} response team.`, "success");
+                    emergencyForm.reset();
+                    incidentOptions.forEach(opt => opt.classList.remove('selected'));
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || "Failed to report emergency.");
+                }
+            } catch (error) {
+                console.error("Error submitting report:", error);
+                showStatus(`Failed to submit report: ${error.message}`, "error");
+            }
+        }
+
+
+        window.addEventListener('load', initApp);
+        
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.style.display = 'flex';
+        });
+        
+        closeModal.addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', (event) => {
+            if (event.target === settingsModal) {
+                settingsModal.style.display = 'none';
+            }
+        });
+        
+        saveSettingsBtn.addEventListener('click', () => {
+            const apiUrl = apiUrlInput.value.trim();
+            if (apiUrl) {
+                localStorage.setItem('emergencyApiUrl', apiUrl);
+                showStatus("Settings saved successfully.", "success");
+                settingsModal.style.display = 'none';
+            } else {
+                showStatus("Please enter a valid API URL.", "error");
+            }
+        });
+        
+        emergencyForm.addEventListener('submit', submitReport);
+    </script>    
+</body>
+</html>
