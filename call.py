@@ -4,7 +4,7 @@ import requests
 from twilio.rest import Client
 from dotenv import load_dotenv
 
-sys.stdout.reconfigure(encoding='utf-8')
+# sys.stdout.reconfigure(encoding='utf-8')  # Removed for Vercel compatibility
 
 
 load_dotenv()
