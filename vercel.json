@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "api/index.py"
+    }
+  ],
+  "env": {
+    "TELEGRAM_BOT_TOKEN": "@TELEGRAM_BOT_TOKEN",
+    "TELEGRAM_CHAT_ID": "@TELEGRAM_CHAT_ID",
+    "GROQ_API_KEY1": "@GROQ_API_KEY1",
+    "TWILIO_ACCOUNT_SID": "@TWILIO_ACCOUNT_SID",
+    "TWILIO_AUTH_TOKEN": "@TWILIO_AUTH_TOKEN",
+    "TWILIO_PHONE_NUMBER": "@TWILIO_PHONE_NUMBER"
+  }
+}
